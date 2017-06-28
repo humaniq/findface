@@ -24,3 +24,5 @@ type Face struct {
 	// List of gallery names to add face(s) to.
 	Galleries []string `json:"galleries"`
 }
+
+type FacesService service

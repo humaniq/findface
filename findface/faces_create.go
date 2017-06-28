@@ -47,8 +47,6 @@ type FaceCreateResult struct {
 	} `json:"results"`
 }
 
-type FacesService service
-
 // Processes the provided URL, detects faces and adds the detected faces to the searchable dataset. If there are multiple faces on a photo, only the biggest face is added by default.
 func (s *FacesService) Create(ctx context.Context, opt *FaceCreateOptions) (*FaceCreateResult, error) {
 	req, err := s.client.NewRequest("POST", faceCreatePath, opt)
