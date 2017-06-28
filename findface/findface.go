@@ -37,6 +37,7 @@ type Client struct {
 
 	// Services used for talking to different parts of the FindFace
 	Face *FacesService
+	Meta *MetaService
 }
 
 // NewClient returns a new FindFace API client.
@@ -55,6 +56,7 @@ func NewClient(httpClient *http.Client) *Client {
 
 	c.common.client = c
 	c.Face = (*FacesService)(&c.common)
+	c.Meta = (*MetaService)(&c.common)
 
 	return c
 }
