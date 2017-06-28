@@ -15,6 +15,14 @@ type Face struct {
 	// Metadata string that you can use to store any information associated with the face.
 	Meta string `json:"meta"`
 
+	// Age
+	Age int `json:"age"`
+
+	// List of emotions
+	Emotions []string `json:"emotions"`
+	// Gender
+	Gender string `json:"gender"`
+
 	// Url of the photo
 	Photo     string `json:"photo"`
 	PhotoHash string `json:"photo_hash"`

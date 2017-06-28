@@ -28,13 +28,16 @@ func TestFacesService_Create(t *testing.T) {
 	if err != nil {
 		t.Errorf("Face.Create returned error: %v", err)
 	}
-	result := faceCreateResult.Results[0]
+	face := faceCreateResult.Faces[0]
 	wantedFace := Face{
 		ID:        2333,
 		Meta:      "Sam Berry",
+		Age:       40,
+		Gender:    "male",
 		PhotoHash: "dc7ac54590729669ca869a18d92cd05e",
 		Timestamp: "2016-06-13T11:06:42.075754",
 		Galleries: []string{"default", "ppl"},
+		Emotions:  []string{"neutral", "surprised"},
 		BoundingBox: BoundingBox{
 			X1: 225,
 			X2: 307,
@@ -43,7 +46,5 @@ func TestFacesService_Create(t *testing.T) {
 		},
 	}
 
-	testDeepEqual(t, result.Face, wantedFace, "Face.Create")
-	testDeepEqual(t, result.Age, 40, "Face.Create")
-	testDeepEqual(t, result.Emotions, []string{"neutral", "surprised"}, "Face.Create")
+	testDeepEqual(t, face, wantedFace, "Face.Create")
 }
