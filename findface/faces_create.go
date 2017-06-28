@@ -35,7 +35,7 @@ type FaceCreateOptions struct {
 
 type FaceCreateResult struct {
 	FindFaceResponse
-	Faces []Face `json:"results"`
+	Faces []*Face `json:"results"`
 }
 
 // Processes the provided URL, detects faces and adds the detected faces to the searchable dataset. If there are multiple faces on a photo, only the biggest face is added by default.

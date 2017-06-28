@@ -29,7 +29,7 @@ func TestFacesService_Create(t *testing.T) {
 		t.Errorf("Face.Create returned error: %v", err)
 	}
 	face := faceCreateResult.Faces[0]
-	wantedFace := Face{
+	wantedFace := &Face{
 		ID:        2333,
 		Meta:      "Sam Berry",
 		Age:       40,

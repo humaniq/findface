@@ -19,7 +19,7 @@ type FaceDetectOptions struct {
 
 type FaceDetectResult struct {
 	FindFaceResponse
-	Faces []Face
+	Faces []*Face
 }
 
 func (s *FacesService) Detect(ctx context.Context, opt *FaceDetectOptions) (*FaceDetectResult, error) {

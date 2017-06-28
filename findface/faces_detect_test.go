@@ -30,7 +30,7 @@ func TestFacesService_Detect(t *testing.T) {
 		t.Errorf("Face.Detect returned error: %v", err)
 	}
 	face := result.Faces[0]
-	wantedFace := Face{
+	wantedFace := &Face{
 		ID:       0,
 		Age:      36,
 		Emotions: []string{"neutral", "happy"},
