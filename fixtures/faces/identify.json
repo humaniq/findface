@@ -1,0 +1,25 @@
+{
+  "results": {
+    "[610, 157, 796, 342]": [
+      {
+        "confidence": 1,
+        "face": {
+          "galleries": [
+            "default",
+            "ppl"
+          ],
+          "id": 2333,
+          "meta": "Sam Berry",
+          "photo": "http://static.findface.pro/sample.jpg",
+          "photo_hash": "dc7ac54590729669ca869a18d92cd05e",
+          "thumbnail": "https://static.findface.pro/57726179d6946f02f3763824/dc7ac54590729669ca869a18d92cd05e_thumb.jpg",
+          "timestamp": "2016-06-13T11:06:42.075754",
+          "x1": 225,
+          "x2": 307,
+          "y1": 345,
+          "y2": 428
+        }
+      }
+    ]
+  }
+}
