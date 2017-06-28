@@ -9,4 +9,4 @@ before_install:
 #   - govendor sync
 
 script:
-  - go test -v
+  - go test -v ./...
