@@ -4,10 +4,6 @@ import (
 	"context"
 )
 
-const (
-	faceCreatePath = "/face"
-)
-
 type FaceCreateOptions struct {
 	// Url of the photo
 	Photo string `json:"photo"`
@@ -49,7 +45,7 @@ type FaceCreateResult struct {
 
 // Processes the provided URL, detects faces and adds the detected faces to the searchable dataset. If there are multiple faces on a photo, only the biggest face is added by default.
 func (s *FacesService) Create(ctx context.Context, opt *FaceCreateOptions) (*FaceCreateResult, error) {
-	req, err := s.client.NewRequest("POST", faceCreatePath, opt)
+	req, err := s.client.NewRequest("POST", "/face", opt)
 	if err != nil {
 		return nil, err
 	}

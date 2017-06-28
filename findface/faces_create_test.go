@@ -10,7 +10,7 @@ func TestFacesService_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(faceCreatePath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/face", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		err := writeResponseFromFile(w, "faces/create_success.json")
 		if err != nil {
