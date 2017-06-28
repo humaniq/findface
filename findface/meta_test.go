@@ -11,7 +11,7 @@ func TestMetaService_List(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/meta/gallery/my_gallery", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "POST")
+		testMethod(t, r, "GET")
 		err := writeResponseFromFile(w, "meta/list.json")
 		if err != nil {
 			t.Error(err)

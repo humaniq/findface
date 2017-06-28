@@ -24,7 +24,7 @@ func (s *MetaService) List(ctx context.Context, galleryName string) (*MetaListRe
 		path = strings.Join([]string{path, "gallery", galleryName}, "/")
 	}
 
-	req, err := s.client.NewRequest("POST", path, nil)
+	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
