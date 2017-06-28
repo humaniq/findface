@@ -1,6 +1,9 @@
 # findface #
 Golang client for FindFace cloud API
 
+**Documentation:** [![GoDoc](https://godoc.org/github.com/humaniq/findface/findface?status.svg)](https://godoc.org/github.com/humaniq/findface/findface)
+**Build status:** [![Vexor status](https://ci.vexor.io/projects/eaac14f5-b552-4fd8-8f66-70b5cff44115/status.svg)](https://ci.vexor.io/ui/projects/eaac14f5-b552-4fd8-8f66-70b5cff44115/builds)
+
 findface requires Go version 1.7 or greater.
 
 ## Usage ##
