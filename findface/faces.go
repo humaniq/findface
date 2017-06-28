@@ -1,5 +1,12 @@
 package findface
 
+import (
+	"context"
+	"strings"
+)
+
+type FacesService service
+
 type BoundingBox struct {
 	X1 int `json:"x1"`
 	Y1 int `json:"y1"`
@@ -33,4 +40,34 @@ type Face struct {
 	Galleries []string `json:"galleries"`
 }
 
-type FacesService service
+type FaceListOptions struct {
+	// Gallery name
+	GalleryName string `json:"gallery"`
+
+	// Pagination parameters
+	MinID, MaxID int
+}
+
+type FaceListResult struct {
+	FindFaceResponse
+	Faces    []*Face `json:"results"`
+	NextPage string  `json:"next_page"`
+}
+
+// Returns the list of all faces stored in gallery or account.
+func (s *FacesService) List(ctx context.Context, opt *FaceListOptions) (*FaceListResult, error) {
+	var path = "/faces"
+	if opt.GalleryName != "" {
+		path = strings.Join([]string{path, "gallery", opt.GalleryName}, "/")
+	}
+
+	req, err := s.client.NewRequest("GET", path, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	var result *FaceListResult
+	resp, err := s.client.Do(ctx, req, &result)
+	result.Response = resp
+	return result, err
+}
