@@ -45,8 +45,8 @@ func (s *FacesService) Create(ctx context.Context, opt *FaceCreateOptions) (*Fac
 		return nil, err
 	}
 
-	faceCreateResult := &FaceCreateResult{}
-	resp, err := s.client.Do(ctx, req, &faceCreateResult)
-	faceCreateResult.Response = resp
-	return faceCreateResult, err
+	var result *FaceCreateResult
+	resp, err := s.client.Do(ctx, req, &result)
+	result.Response = resp
+	return result, err
 }

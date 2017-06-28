@@ -1,0 +1,17 @@
+{
+  "faces": [
+    {
+      "age": 36,
+      "emotions": [
+        "neutral",
+        "happy"
+      ],
+      "gender": "female",
+      "x1": 236,
+      "x2": 311,
+      "y1": 345,
+      "y2": 419
+    }
+  ],
+  "orientation": 1
+}
