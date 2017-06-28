@@ -43,6 +43,9 @@ type FaceVerifyResult struct {
 	Verified   bool    `json:"verified"`
 }
 
+// This method verifies that two faces belong to the same person, or, alternatively, measures the similarity between the two faces. You can choose between these two modes by setting the threshold parameter.
+// In the case, when a binary decision is required, the user can pass a value for the threshold parameter. We provide 3 preset values for the threshold: strict, medium and low, with the former aimed at minimizing the false accept rates and the latter being somewhat more permissive. The client can also override these preset values by a fixed threshold.
+// Please feel free to contact us if you need to tune the threshold value for your specific use-case and/or dataset.
 func (s *FacesService) Verify(ctx context.Context, opt *FaceVerifyOptions) (*FaceVerifyResultResponse, error) {
 	req, err := s.client.NewRequest("POST", "/verify", opt)
 	if err != nil {

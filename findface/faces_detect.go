@@ -23,6 +23,8 @@ type FaceDetectResult struct {
 	Orientation int `json:"orientation"`
 }
 
+// This method detects faces on the provided image.
+// You shuld provide an URL, which the API will use to fetch the image.
 func (s *FacesService) Detect(ctx context.Context, opt *FaceDetectOptions) (*FaceDetectResult, error) {
 	req, err := s.client.NewRequest("POST", "/detect", opt)
 	if err != nil {

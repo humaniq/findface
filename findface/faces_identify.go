@@ -36,6 +36,7 @@ type FaceIdentifyResponse struct {
 	ResultsMap map[string][]*FaceIdentifyResult `json:"results"`
 }
 
+// This method searches through the face dataset. The method returns at most n faces (one by default), which are the most similar to the specified face, and the similarity confidence is above the specified threshold.
 func (s *FacesService) Identify(ctx context.Context, opt *FaceIdentifyOptions) (*FaceIdentifyResponse, error) {
 	var path = "/identify"
 
