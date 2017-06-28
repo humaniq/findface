@@ -19,7 +19,8 @@ type FaceDetectOptions struct {
 
 type FaceDetectResult struct {
 	FindFaceResponse
-	Faces []*Face
+	Faces       []*Face
+	Orientation int `json:"orientation"`
 }
 
 func (s *FacesService) Detect(ctx context.Context, opt *FaceDetectOptions) (*FaceDetectResult, error) {

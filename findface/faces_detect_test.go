@@ -44,4 +44,5 @@ func TestFacesService_Detect(t *testing.T) {
 	}
 
 	testDeepEqual(t, face, wantedFace, "Face.Create")
+	testDeepEqual(t, result.Orientation, 1, "Face.Create")
 }
