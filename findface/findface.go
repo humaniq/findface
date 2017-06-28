@@ -13,11 +13,15 @@ import (
 
 const (
 	libraryVersion = "0.1.0"
-	defaultBaseURL = "https://api.findface.pro/v0/"
+	defaultBaseURL = "https://api.findface.pro/v1/"
 	userAgent      = "go-findface/" + libraryVersion
 
 	headerTokenAuth = "Authorization"
 )
+
+type service struct {
+	client *Client
+}
 
 type Client struct {
 	client *http.Client // HTTP client used to communicate with the API.
@@ -29,13 +33,15 @@ type Client struct {
 	// User agent used when communicating with the FindFace API.
 	UserAgent string
 
+	common service // Reuse a single struct instead of allocating one for each service on the heap.
+
 	// Services used for talking to different parts of the FindFace
-	// TODO
+	Face *FacesService
 }
 
 // NewClient returns a new FindFace API client.
 // If a nil httpClient is provided, http.DefaultClient will be used.
-func NewClient(baseUrl string, httpClient *http.Client) *Client {
+func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
@@ -45,13 +51,19 @@ func NewClient(baseUrl string, httpClient *http.Client) *Client {
 		UserAgent: userAgent,
 	}
 
-	if baseUrl != "" {
-		c.BaseURL, _ = url.Parse(baseUrl)
-	} else {
-		c.BaseURL, _ = url.Parse(defaultBaseURL)
-	}
+	c.BaseURL, _ = url.Parse(defaultBaseURL)
+
+	c.common.client = c
+	c.Face = (*FacesService)(&c.common)
 
 	return c
+}
+
+// NewAuthClient returns a new FindFace API client with Authentication header.
+// If a nil httpClient is provided, http.DefaultClient will be used.
+func NewAuthClient(token string, httpClient *http.Client) *Client {
+	tp := &TokenAuthTransport{Token: token}
+	return NewClient(tp.Client())
 }
 
 // NewRequest creates an API request. A relative URL can be provided in urlPath,
@@ -188,4 +200,8 @@ func cloneRequest(r *http.Request) *http.Request {
 		r2.Header[k] = append([]string(nil), s...)
 	}
 	return r2
+}
+
+type FindFaceResponse struct {
+	Response *http.Response
 }

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -32,7 +33,7 @@ func setup() {
 	server = httptest.NewServer(mux)
 
 	// configure findface client to use test server
-	client = NewClient("", nil)
+	client = NewClient(nil)
 
 	url, _ := url.Parse(server.URL)
 	client.BaseURL = url
@@ -52,6 +53,21 @@ func testMethod(t *testing.T, r *http.Request, want string) {
 func testHeader(t *testing.T, r *http.Request, header string, want string) {
 	if got := r.Header.Get(header); got != want {
 		t.Errorf("Header.Get(%q) returned %q, want %q", header, got, want)
+	}
+}
+
+func writeResponseFromFile(w http.ResponseWriter, fixturePath string) error {
+	b, err := ioutil.ReadFile("../fixtures/" + fixturePath)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(b)
+	return err
+}
+
+func testDeepEqual(t *testing.T, v interface{}, want interface{}, message string) {
+	if !reflect.DeepEqual(v, want) {
+		t.Errorf("%s returned:\n%+v, want:\n%+v", message, v, want)
 	}
 }
 
@@ -84,7 +100,7 @@ func testJSONMarshal(t *testing.T, v interface{}, want string) {
 }
 
 func TestNewClient(t *testing.T) {
-	c := NewClient("", nil)
+	c := NewClient(nil)
 
 	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
 		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
@@ -95,7 +111,7 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestNewRequest_invalidJSON(t *testing.T) {
-	c := NewClient("", nil)
+	c := NewClient(nil)
 
 	type T struct {
 		A map[interface{}]interface{}
@@ -183,7 +199,7 @@ func TestTokenAuthTransport(t *testing.T) {
 
 	tp := &TokenAuthTransport{Token: token}
 
-	tokenAuthClient := NewClient("", tp.Client())
+	tokenAuthClient := NewClient(tp.Client())
 	tokenAuthClient.BaseURL = client.BaseURL
 	req, _ := tokenAuthClient.NewRequest("GET", "/", nil)
 	tokenAuthClient.Do(context.Background(), req, nil)
