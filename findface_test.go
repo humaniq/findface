@@ -60,7 +60,7 @@ func testHeader(t *testing.T, r *http.Request, header string, want string) {
 }
 
 func writeResponseFromFile(w http.ResponseWriter, fixturePath string) error {
-	b, err := ioutil.ReadFile("../fixtures/" + fixturePath)
+	b, err := ioutil.ReadFile("fixtures/" + fixturePath)
 	if err != nil {
 		return err
 	}
