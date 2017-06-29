@@ -4,6 +4,10 @@ import (
 	"context"
 )
 
+const (
+	galleryNameRegexp = "[a-zA-Z0-9_-]+"
+)
+
 type GalleriesService service
 
 type GalleriesListResponse struct {
