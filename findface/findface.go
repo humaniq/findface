@@ -36,8 +36,9 @@ type Client struct {
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
 
 	// Services used for talking to different parts of the FindFace
-	Face *FacesService
-	Meta *MetaService
+	Face      *FacesService
+	Meta      *MetaService
+	Galleries *GalleriesService
 }
 
 // NewClient returns a new FindFace API client.
@@ -57,6 +58,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.common.client = c
 	c.Face = (*FacesService)(&c.common)
 	c.Meta = (*MetaService)(&c.common)
+	c.Galleries = (*GalleriesService)(&c.common)
 
 	return c
 }
