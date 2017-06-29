@@ -11,12 +11,33 @@ type FacesDeleteResponse struct {
 	FindFaceResponse
 }
 
-func (s *FacesService) Delete(ctx context.Context, faceID int) (*FacesDeleteResponse, error) {
-	if faceID <= 0 {
-		return nil, fmt.Errorf("faceID shuld be > 0, but was: %d", faceID)
-	}
+type FaceDeleteOptions struct {
+	FaceID      int
+	GalleryName string
+	Meta        string
+}
 
-	urlPath := path.Join("/faces/id", strconv.Itoa(faceID))
+func (o *FaceDeleteOptions) Path() (string, error) {
+	var urlPath string
+
+	switch {
+	case o.FaceID > 0:
+		urlPath = path.Join("/faces/id", strconv.Itoa(o.FaceID))
+	case o.Meta != "" && o.GalleryName != "":
+		urlPath = path.Join("/faces/gallery", o.GalleryName, "meta", o.Meta)
+	case o.Meta != "":
+		urlPath = path.Join("/faces/meta", o.Meta)
+	default:
+		return "", fmt.Errorf("FaceDeleteOptions is invalid.")
+	}
+	return urlPath, nil
+}
+
+func (s *FacesService) Delete(ctx context.Context, opt *FaceDeleteOptions) (*FacesDeleteResponse, error) {
+	urlPath, err := opt.Path()
+	if err != nil {
+		return nil, err
+	}
 
 	req, err := s.client.NewRequest("DELETE", urlPath, nil)
 	if err != nil {
