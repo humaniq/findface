@@ -6,6 +6,35 @@ import (
 	"testing"
 )
 
+func TestFaceListOptions_Path(t *testing.T) {
+	tests := []struct {
+		opt  *FaceListOptions
+		path string
+	}{{
+		opt:  &FaceListOptions{},
+		path: "/faces",
+	}, {
+		opt:  &FaceListOptions{Meta: "metadata"},
+		path: "/faces/meta/metadata",
+	}, {
+		opt:  &FaceListOptions{GalleryName: "my_gallery"},
+		path: "/faces/gallery/my_gallery",
+	}, {
+		opt:  &FaceListOptions{Meta: "metadata", GalleryName: "my_gallery"},
+		path: "/faces/gallery/my_gallery/meta/metadata",
+	}}
+
+	for _, test := range tests {
+		result, err := test.opt.Path()
+		if err != nil {
+			t.Error(err)
+		}
+		if result != test.path {
+			t.Errorf("Real: %s, but expected: %s", result, test.path)
+		}
+	}
+}
+
 func TestFacesService_List(t *testing.T) {
 	setup()
 	defer teardown()

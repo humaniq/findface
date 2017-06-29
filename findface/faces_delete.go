@@ -12,9 +12,12 @@ type FacesDeleteResponse struct {
 }
 
 type FaceDeleteOptions struct {
-	FaceID      int
+	// Face ID
+	FaceID int
+	// Gallery name
 	GalleryName string
-	Meta        string
+	// Metadata string to filter faces by.
+	Meta string
 }
 
 func (o *FaceDeleteOptions) Path() (string, error) {

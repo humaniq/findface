@@ -2,7 +2,7 @@ package findface
 
 import (
 	"context"
-	"strings"
+	"path"
 )
 
 type FacesService service
@@ -42,10 +42,29 @@ type Face struct {
 
 type FaceListOptions struct {
 	// Gallery name
-	GalleryName string `json:"gallery"`
+	GalleryName string
 
 	// Pagination parameters
 	MinID, MaxID int
+
+	// Metadata string to filter faces by.
+	Meta string
+}
+
+func (o *FaceListOptions) Path() (string, error) {
+	var urlPath string
+	switch {
+	case o.GalleryName != "" && o.Meta != "":
+		urlPath = path.Join("/faces/gallery/", o.GalleryName, "meta", o.Meta)
+	case o.Meta != "":
+		urlPath = path.Join("/faces/meta/", o.Meta)
+	case o.GalleryName != "":
+		urlPath = path.Join("/faces/gallery/", o.GalleryName)
+	default:
+		urlPath = "/faces"
+	}
+
+	return urlPath, nil
 }
 
 type FaceListResult struct {
@@ -56,12 +75,12 @@ type FaceListResult struct {
 
 // Returns the list of all faces stored in gallery or account.
 func (s *FacesService) List(ctx context.Context, opt *FaceListOptions) (*FaceListResult, error) {
-	var path = "/faces"
-	if opt.GalleryName != "" {
-		path = strings.Join([]string{path, "gallery", opt.GalleryName}, "/")
+	path, err := opt.Path()
+	if err != nil {
+		return nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", path, opt)
+	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
