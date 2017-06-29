@@ -41,11 +41,12 @@ type Client struct {
 	Galleries *GalleriesService
 }
 
-// NewClient returns a new FindFace API client.
-// If a nil httpClient is provided, http.DefaultClient will be used.
-func NewClient(httpClient *http.Client) *Client {
+// NewClient returns a new FindFace API client with Authentication header.
+// If a nil httpClient is provided, http.Client with TokenAuthTransport will be used.
+func NewClient(token string, httpClient *http.Client) *Client {
 	if httpClient == nil {
-		httpClient = http.DefaultClient
+		tp := &TokenAuthTransport{Token: token}
+		httpClient = tp.Client()
 	}
 
 	c := &Client{
@@ -61,13 +62,6 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Galleries = (*GalleriesService)(&c.common)
 
 	return c
-}
-
-// NewAuthClient returns a new FindFace API client with Authentication header.
-// If a nil httpClient is provided, http.DefaultClient will be used.
-func NewAuthClient(token string, httpClient *http.Client) *Client {
-	tp := &TokenAuthTransport{Token: token}
-	return NewClient(tp.Client())
 }
 
 // NewRequest creates an API request. A relative URL can be provided in urlPath,

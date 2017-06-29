@@ -18,7 +18,7 @@ access different parts of the FindFace.pro API. For example:
 You shuld request Authentication token.
 
 ```go
-client := findface.NewAuthClient(token, nil)
+client := findface.NewClient(token, nil)
 
 // list all faces
 result, err := client.Face.List(context.Background(), &FaceListOptions{})

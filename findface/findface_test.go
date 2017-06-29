@@ -22,6 +22,9 @@ var (
 
 	// server is a test HTTP server used to provide mock API responses.
 	server *httptest.Server
+
+	// test auth token
+	token = "yfT8ftheVqnDLS3Q0yCiTH3E8YY_cm4p"
 )
 
 // setup sets up a test HTTP server along with a findface.Client that is
@@ -33,7 +36,7 @@ func setup() {
 	server = httptest.NewServer(mux)
 
 	// configure findface client to use test server
-	client = NewClient(nil)
+	client = NewClient(token, nil)
 
 	url, _ := url.Parse(server.URL)
 	client.BaseURL = url
@@ -100,7 +103,7 @@ func testJSONMarshal(t *testing.T, v interface{}, want string) {
 }
 
 func TestNewClient(t *testing.T) {
-	c := NewClient(nil)
+	c := NewClient(token, nil)
 
 	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
 		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
@@ -111,7 +114,7 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestNewRequest_invalidJSON(t *testing.T) {
-	c := NewClient(nil)
+	c := NewClient(token, nil)
 
 	type T struct {
 		A map[interface{}]interface{}
@@ -187,7 +190,6 @@ func TestTokenAuthTransport(t *testing.T) {
 	setup()
 	defer teardown()
 
-	token := "yfT8ftheVqnDLS3Q0yCiTH3E8YY_cm4p"
 	wantedToken := fmt.Sprintf("Token %s", token)
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -197,9 +199,7 @@ func TestTokenAuthTransport(t *testing.T) {
 		}
 	})
 
-	tp := &TokenAuthTransport{Token: token}
-
-	tokenAuthClient := NewClient(tp.Client())
+	tokenAuthClient := NewClient(token, nil)
 	tokenAuthClient.BaseURL = client.BaseURL
 	req, _ := tokenAuthClient.NewRequest("GET", "/", nil)
 	tokenAuthClient.Do(context.Background(), req, nil)
