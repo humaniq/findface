@@ -20,7 +20,7 @@ func TestMetaService_List(t *testing.T) {
 
 	resultResponse, err := client.Meta.List(context.Background(), "my_gallery")
 	if err != nil {
-		t.Errorf("Face.Verify returned error: %v", err)
+		t.Errorf("Meta.List returned error: %v", err)
 	}
 	firstResult := resultResponse.Results[0]
 
