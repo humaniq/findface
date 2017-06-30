@@ -6,6 +6,14 @@ Golang client for FindFace cloud API
 
 findface requires Go version 1.7 or greater.
 
+This is the Go wrapper for the [FindFace PRO Facial Recognition API](https://findface.pro/en/). The wrapper was written for [Humaniq.co](https://humaniq.co/) project needs, during the facial image research process. 
+
+## Contributors
+This  wrapper was developed by:
+
+* [Alexander Kirillov](https://github.com/saratovsource)
+
+
 ## Usage ##
 
 ```go
