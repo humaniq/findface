@@ -23,7 +23,7 @@ import "github.com/humaniq/findface"
 Create new Findface.pro client, then use the various services on the client to
 access different parts of the FindFace.pro API. For example:
 
-You shuld request Authentication token.
+You should request an Authentication token.
 
 ```go
 client := findface.NewClient(token, nil)
@@ -35,7 +35,7 @@ if err != nil {
 }
 ```
 
-You can specify options:
+You can specify the options:
 ```go
 
 // List all faces from `my_gallery`
