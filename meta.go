@@ -32,12 +32,21 @@ func (s *MetaService) List(ctx context.Context, galleryName string) (*MetaListRe
 	}
 
 	var result *MetaListResponse
+	var fErr *FindFaceError
 	resp, rawResp, err := s.client.Do(ctx, req)
+	switch resp.StatusCode {
+	case 200:
+		unErr := json.Unmarshal(rawResp, &result)
+		if unErr != nil {
+			return nil, unErr
+		}
+	case 400:
+		unErr := json.Unmarshal(rawResp, &fErr)
+		if unErr != nil {
+			return nil, unErr
+		}
+	}
 	result.Response = resp
 	result.RawResponseBody = rawResp
-	unErr := json.Unmarshal(rawResp, &result.Results)
-	if unErr != nil {
-		return nil, unErr
-	}
 	return result, err
 }
