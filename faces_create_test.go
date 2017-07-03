@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"testing"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestFacesService_Create(t *testing.T) {
@@ -28,6 +30,7 @@ func TestFacesService_Create(t *testing.T) {
 	if err != nil {
 		t.Errorf("Face.Create returned error: %v", err)
 	}
+	spew.Dump(faceCreateResult.RawResponseBody)
 	face := faceCreateResult.Faces[0]
 	wantedFace := &Face{
 		ID:        2333,

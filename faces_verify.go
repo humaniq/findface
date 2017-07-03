@@ -30,6 +30,7 @@ type FaceVerifyOptions struct {
 
 type FaceVerifyResultResponse struct {
 	FindFaceResponse
+	Error   *FindFaceError
 	Results []*FaceVerifyResult `json:"results"`
 }
 
@@ -53,7 +54,8 @@ func (s *FacesService) Verify(ctx context.Context, opt *FaceVerifyOptions) (*Fac
 	}
 
 	var result *FaceVerifyResultResponse
-	resp, err := s.client.Do(ctx, req, &result)
+	resp, rawResp, err := s.client.Do(ctx, req)
 	result.Response = resp
+	result.RawResponseBody = rawResp
 	return result, err
 }

@@ -12,6 +12,7 @@ type GalleriesService service
 
 type GalleriesListResponse struct {
 	FindFaceResponse
+	Error     *FindFaceError
 	Galleries []string `json:"results"`
 }
 
@@ -23,7 +24,8 @@ func (s *GalleriesService) List(ctx context.Context) (*GalleriesListResponse, er
 	}
 
 	var result *GalleriesListResponse
-	resp, err := s.client.Do(ctx, req, &result)
+	resp, rawResp, err := s.client.Do(ctx, req)
 	result.Response = resp
+	result.RawResponseBody = rawResp
 	return result, err
 }

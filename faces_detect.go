@@ -2,6 +2,8 @@ package findface
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 )
 
 type FaceDetectOptions struct {
@@ -19,6 +21,7 @@ type FaceDetectOptions struct {
 
 type FaceDetectResult struct {
 	FindFaceResponse
+	Error       *FindFaceError
 	Faces       []*Face
 	Orientation int `json:"orientation"`
 }
@@ -31,8 +34,25 @@ func (s *FacesService) Detect(ctx context.Context, opt *FaceDetectOptions) (*Fac
 		return nil, err
 	}
 
-	var result *FaceDetectResult
-	resp, err := s.client.Do(ctx, req, &result)
+	result := &FaceDetectResult{}
+	resp, rawResp, dErr := s.client.Do(ctx, req)
+	fErr := &FindFaceError{}
+	switch resp.StatusCode {
+	case 200:
+		unErr := json.Unmarshal(rawResp, &result)
+		if unErr != nil {
+			return nil, unErr
+		}
+	case 400:
+		unErr := json.Unmarshal(rawResp, &fErr)
+		if unErr != nil {
+			return nil, unErr
+		}
+	default:
+		err = fmt.Errorf("FindFace returned an unhandled status: %s, body: %s", resp.Status, string(rawResp))
+	}
 	result.Response = resp
-	return result, err
+	result.RawResponseBody = rawResp
+	result.Error = fErr
+	return result, dErr
 }

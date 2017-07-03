@@ -75,16 +75,16 @@ func (c *Client) NewRequest(method, urlPath string, body interface{}) (*http.Req
 
 	u := c.BaseURL.ResolveReference(rel)
 
-	var buf io.ReadWriter
+	var b []byte
 	if body != nil {
-		buf = new(bytes.Buffer)
-		err := json.NewEncoder(buf).Encode(body)
-		if err != nil {
-			return nil, err
+		bb, mErr := json.Marshal(body)
+		if mErr != nil {
+			return nil, mErr
 		}
+		b = bb
 	}
 
-	req, err := http.NewRequest(method, u.String(), buf)
+	req, err := http.NewRequest(method, u.String(), bytes.NewBuffer(b))
 	if err != nil {
 		return nil, err
 	}
@@ -97,15 +97,13 @@ func (c *Client) NewRequest(method, urlPath string, body interface{}) (*http.Req
 		req.Header.Set("User-Agent", c.UserAgent)
 	}
 
-	// TODO: Add authentication
-
 	return req, nil
 }
 
 // Do sends an API request and returns the API response.
 // The provided ctx must be non-nil. If it is canceled or times out,
 // ctx.Err() will be returned.
-func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http.Response, error) {
+func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, []byte, error) {
 	req = req.WithContext(ctx)
 
 	resp, err := c.client.Do(req)
@@ -115,43 +113,26 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 		// the context's error is probably more useful.
 		select {
 		case <-ctx.Done():
-			return nil, ctx.Err()
+			return nil, nil, ctx.Err()
 		default:
 			// Do nothing
 		}
 
-		return nil, err
+		return nil, nil, err
 	}
+
+	b, readErr := ioutil.ReadAll(resp.Body)
+	if readErr != nil {
+		return nil, nil, readErr
+	}
+
 	defer func() {
 		// Drain up to 512 bytes and close the body to let the Transport reuse the connection
 		io.CopyN(ioutil.Discard, resp.Body, 512)
 		resp.Body.Close()
 	}()
 
-	err = CheckResponse(resp)
-
-	if v != nil {
-		if w, ok := v.(io.Writer); ok {
-			io.Copy(w, resp.Body)
-		} else {
-			err = json.NewDecoder(resp.Body).Decode(v)
-			if err == io.EOF {
-				err = nil // ignore EOF errors caused by empty response body
-			}
-		}
-	}
-	return resp, err
-}
-
-// CheckResponse checks the API response for errors, and returns them if
-// present. A response is considered an error if it has a status code outside
-// the 200 range or equal to 202 Accepted.
-func CheckResponse(r *http.Response) error {
-	if c := r.StatusCode; 200 <= c && c <= 299 {
-		return nil
-	}
-
-	return fmt.Errorf("Status code not in 2xx range")
+	return resp, b, err
 }
 
 // TokenAuthTransport is an http.RoundTripper that authenticates all requests
@@ -201,5 +182,20 @@ func cloneRequest(r *http.Request) *http.Request {
 }
 
 type FindFaceResponse struct {
-	Response *http.Response
+	RawResponseBody []byte
+	Response        *http.Response
+}
+
+// FindFaceError represents the error response object that is returned when
+// making a request to findface.
+type FindFaceError struct {
+	Code  string `json:"code"`
+	Faces []struct {
+		X1 int `json:"x1"`
+		X2 int `json:"x2"`
+		Y1 int `json:"y1"`
+		Y2 int `json:"y2"`
+	} `json:"faces"`
+	Param  string `json:"param"`
+	Reason string `json:"reason"`
 }

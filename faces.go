@@ -23,7 +23,7 @@ type Face struct {
 	Meta string `json:"meta"`
 
 	// Age
-	Age int `json:"age"`
+	Age float64 `json:"age"`
 
 	// List of emotions
 	Emotions []string `json:"emotions"`
@@ -69,6 +69,7 @@ func (o *FaceListOptions) Path() (string, error) {
 
 type FaceListResult struct {
 	FindFaceResponse
+	Error    *FindFaceError
 	Faces    []*Face `json:"results"`
 	NextPage string  `json:"next_page"`
 }
@@ -85,8 +86,9 @@ func (s *FacesService) List(ctx context.Context, opt *FaceListOptions) (*FaceLis
 		return nil, err
 	}
 
-	var result *FaceListResult
-	resp, err := s.client.Do(ctx, req, &result)
+	result := &FaceListResult{}
+	resp, rawResp, err := s.client.Do(ctx, req)
 	result.Response = resp
+	result.RawResponseBody = rawResp
 	return result, err
 }

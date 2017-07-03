@@ -8,6 +8,7 @@ import (
 
 type GalleriesCreateResponse struct {
 	FindFaceResponse
+	Error *FindFaceError
 }
 
 // GalleriesCreateOptions valdation
@@ -45,7 +46,8 @@ func (s *GalleriesService) Create(ctx context.Context, name string) (*GalleriesC
 	}
 
 	var result = &GalleriesCreateResponse{}
-	resp, err := s.client.Do(ctx, req, &result)
+	resp, rawResp, err := s.client.Do(ctx, req)
 	result.Response = resp
+	result.RawResponseBody = rawResp
 	return result, err
 }
