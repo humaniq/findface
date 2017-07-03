@@ -7,6 +7,7 @@ import (
 
 type GalleriesDeleteResponse struct {
 	FindFaceResponse
+	Error *FindFaceError
 }
 
 // Delete function deletes the gallery and removed all the faces from it.
@@ -23,7 +24,8 @@ func (s *GalleriesService) Delete(ctx context.Context, name string) (*GalleriesD
 	}
 
 	var result = &GalleriesDeleteResponse{}
-	resp, err := s.client.Do(ctx, req, result)
+	resp, rawResp, err := s.client.Do(ctx, req)
 	result.Response = resp
+	result.RawResponseBody = rawResp
 	return result, err
 }
