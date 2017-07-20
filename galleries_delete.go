@@ -2,6 +2,8 @@ package findface
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"path"
 )
 
@@ -16,16 +18,32 @@ func (s *GalleriesService) Delete(ctx context.Context, name string) (*GalleriesD
 		return nil, err
 	}
 
-	deletePath := path.Join("/galleries", name)
+	deletePath := path.Join("galleries", name)
 
 	req, err := s.client.NewRequest("DELETE", deletePath, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var result = &GalleriesDeleteResponse{}
-	resp, rawResp, err := s.client.Do(ctx, req)
+	var result = GalleriesDeleteResponse{}
+	resp, rawResp, dErr := s.client.Do(ctx, req)
+	var fErr *FindFaceError
+	switch resp.StatusCode {
+	case 200:
+		unErr := json.Unmarshal(rawResp, &result)
+		if unErr != nil {
+			return nil, unErr
+		}
+	case 400:
+		unErr := json.Unmarshal(rawResp, &fErr)
+		if unErr != nil {
+			return nil, unErr
+		}
+	default:
+		err = fmt.Errorf("FindFace returned an unhandled status: %s, body: %s", resp.Status, string(rawResp))
+	}
 	result.Response = resp
 	result.RawResponseBody = rawResp
-	return result, err
+	result.Error = fErr
+	return &result, dErr
 }
