@@ -2,6 +2,7 @@ package findface
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"regexp"
 )
@@ -40,14 +41,30 @@ func (s *GalleriesService) Create(ctx context.Context, name string) (*GalleriesC
 		Name string `json:"name"`
 	}{Name: name}
 
-	req, err := s.client.NewRequest("POST", "/galleries", &opt)
+	req, err := s.client.NewRequest("POST", "galleries", &opt)
 	if err != nil {
 		return nil, err
 	}
 
-	var result = &GalleriesCreateResponse{}
-	resp, rawResp, err := s.client.Do(ctx, req)
+	var result = GalleriesCreateResponse{}
+	resp, rawResp, dErr := s.client.Do(ctx, req)
+	var fErr *FindFaceError
+	switch resp.StatusCode {
+	case 200:
+		unErr := json.Unmarshal(rawResp, &result)
+		if unErr != nil {
+			return nil, unErr
+		}
+	case 400:
+		unErr := json.Unmarshal(rawResp, &fErr)
+		if unErr != nil {
+			return nil, unErr
+		}
+	default:
+		err = fmt.Errorf("FindFace returned an unhandled status: %s, body: %s", resp.Status, string(rawResp))
+	}
 	result.Response = resp
 	result.RawResponseBody = rawResp
-	return result, err
+	result.Error = fErr
+	return &result, dErr
 }
