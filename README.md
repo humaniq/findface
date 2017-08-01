@@ -26,7 +26,7 @@ access different parts of the FindFace.pro API. For example:
 You should request an Authentication token.
 
 ```go
-client := findface.NewClient(token, nil, "")
+client := findface.NewClient(token, nil, nil)
 
 // list all faces
 result, err := client.Face.List(context.Background(), &FaceListOptions{})

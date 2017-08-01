@@ -43,7 +43,7 @@ type Client struct {
 
 // NewClient returns a new FindFace API client with Authentication header.
 // If a nil httpClient is provided, http.Client with TokenAuthTransport will be used.
-func NewClient(token string, httpClient *http.Client, endpoint string) *Client {
+func NewClient(token string, httpClient *http.Client, endpoint *url.URL) *Client {
 	if httpClient == nil {
 		tp := &TokenAuthTransport{Token: token}
 		httpClient = tp.Client()
@@ -54,8 +54,8 @@ func NewClient(token string, httpClient *http.Client, endpoint string) *Client {
 		UserAgent: userAgent,
 	}
 
-	if endpoint != "" {
-		c.BaseURL, _ = url.Parse(endpoint)
+	if endpoint != nil {
+		c.BaseURL = endpoint
 	} else {
 		c.BaseURL, _ = url.Parse(defaultBaseURL)
 	}
