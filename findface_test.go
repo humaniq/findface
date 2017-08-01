@@ -34,7 +34,7 @@ func setup() {
 	server = httptest.NewServer(mux)
 
 	// configure findface client to use test server
-	client = NewClient(token, nil)
+	client = NewClient(token, nil, "")
 
 	url, _ := url.Parse(server.URL)
 	client.BaseURL = url
@@ -101,18 +101,22 @@ func testJSONMarshal(t *testing.T, v interface{}, want string) {
 }
 
 func TestNewClient(t *testing.T) {
-	c := NewClient(token, nil)
+	defaultClient := NewClient(token, nil, "")
+	customClient := NewClient(token, nil, "https://custom.enpoint.local/v1")
 
-	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
+	if got, want := defaultClient.BaseURL.String(), defaultBaseURL; got != want {
 		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
 	}
-	if got, want := c.UserAgent, userAgent; got != want {
+	if got, want := customClient.BaseURL.String(), "https://custom.enpoint.local/v1"; got != want {
+		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
+	}
+	if got, want := defaultClient.UserAgent, userAgent; got != want {
 		t.Errorf("NewClient UserAgent is %v, want %v", got, want)
 	}
 }
 
 func TestNewRequest_invalidJSON(t *testing.T) {
-	c := NewClient(token, nil)
+	c := NewClient(token, nil, "")
 
 	type T struct {
 		A map[interface{}]interface{}
