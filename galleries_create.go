@@ -2,14 +2,12 @@ package findface
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"regexp"
 )
 
 type GalleriesCreateResponse struct {
 	FindFaceResponse
-	Error *FindFaceError
 }
 
 // GalleriesCreateOptions valdation
@@ -46,25 +44,12 @@ func (s *GalleriesService) Create(ctx context.Context, name string) (*GalleriesC
 		return nil, err
 	}
 
-	var result = GalleriesCreateResponse{}
-	resp, rawResp, dErr := s.client.Do(ctx, req)
-	var fErr *FindFaceError
-	switch resp.StatusCode {
-	case 200:
-		unErr := json.Unmarshal(rawResp, &result)
-		if unErr != nil {
-			return nil, unErr
-		}
-	case 400:
-		unErr := json.Unmarshal(rawResp, &fErr)
-		if unErr != nil {
-			return nil, unErr
-		}
-	default:
-		err = fmt.Errorf("FindFace returned an unhandled status: %s, body: %s", resp.Status, string(rawResp))
+	result := GalleriesCreateResponse{}
+
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
 	}
-	result.Response = resp
-	result.RawResponseBody = rawResp
-	result.Error = fErr
-	return &result, dErr
+
+	return &result, nil
 }

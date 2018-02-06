@@ -2,8 +2,6 @@ package findface
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 )
 
 type FaceCreateOptions struct {
@@ -38,7 +36,6 @@ type FaceCreateOptions struct {
 type FaceCreateResult struct {
 	FindFaceResponse
 	Faces []*Face `json:"results"`
-	Error *FindFaceError
 }
 
 // Processes the provided URL, detects faces and adds the detected faces to the searchable dataset. If there are multiple faces on a photo, only the biggest face is added by default.
@@ -49,24 +46,11 @@ func (s *FacesService) Create(ctx context.Context, opt *FaceCreateOptions) (*Fac
 	}
 
 	result := FaceCreateResult{}
-	resp, rawResp, dErr := s.client.Do(ctx, req)
-	var fErr *FindFaceError
-	switch resp.StatusCode {
-	case 200:
-		unErr := json.Unmarshal(rawResp, &result)
-		if unErr != nil {
-			return nil, unErr
-		}
-	case 400:
-		unErr := json.Unmarshal(rawResp, &fErr)
-		if unErr != nil {
-			return nil, unErr
-		}
-	default:
-		err = fmt.Errorf("FindFace returned an unhandled status: %s, body: %s", resp.Status, string(rawResp))
+
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
 	}
-	result.Response = resp
-	result.RawResponseBody = rawResp
-	result.Error = fErr
-	return &result, dErr
+
+	return &result, nil
 }

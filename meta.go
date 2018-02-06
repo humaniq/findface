@@ -2,7 +2,6 @@ package findface
 
 import (
 	"context"
-	"encoding/json"
 	"strings"
 )
 
@@ -31,22 +30,12 @@ func (s *MetaService) List(ctx context.Context, galleryName string) (*MetaListRe
 		return nil, err
 	}
 
-	var result *MetaListResponse
-	var fErr *FindFaceError
-	resp, rawResp, err := s.client.Do(ctx, req)
-	switch resp.StatusCode {
-	case 200:
-		unErr := json.Unmarshal(rawResp, &result)
-		if unErr != nil {
-			return nil, unErr
-		}
-	case 400:
-		unErr := json.Unmarshal(rawResp, &fErr)
-		if unErr != nil {
-			return nil, unErr
-		}
+	result := MetaListResponse{}
+
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
 	}
-	result.Response = resp
-	result.RawResponseBody = rawResp
-	return result, err
+
+	return &result, nil
 }

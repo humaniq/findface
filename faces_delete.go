@@ -9,7 +9,6 @@ import (
 
 type FacesDeleteResponse struct {
 	FindFaceResponse
-	Error *FindFaceError
 }
 
 type FaceDeleteOptions struct {
@@ -48,9 +47,12 @@ func (s *FacesService) Delete(ctx context.Context, opt *FaceDeleteOptions) (*Fac
 		return nil, err
 	}
 
-	var result = &FacesDeleteResponse{}
-	resp, rawResp, err := s.client.Do(ctx, req)
-	result.Response = resp
-	result.RawResponseBody = rawResp
-	return result, err
+	result := FacesDeleteResponse{}
+
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, err
 }

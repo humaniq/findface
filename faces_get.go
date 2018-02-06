@@ -10,8 +10,16 @@ import (
 
 type FaceGetResponse struct {
 	FindFaceResponse
-	Error *FindFaceError
 	Faces []*Face
+}
+
+func (r *FaceGetResponse) UnmarshalJSON(data []byte) error {
+	faces := []*Face{}
+	if err := json.Unmarshal(data, &faces); err != nil {
+		return err
+	}
+	r.Faces = faces
+	return nil
 }
 
 func (s *FacesService) Get(ctx context.Context, faceID int) (*FaceGetResponse, error) {
@@ -26,28 +34,12 @@ func (s *FacesService) Get(ctx context.Context, faceID int) (*FaceGetResponse, e
 		return nil, err
 	}
 
-	var result []*Face
-	response := &FaceGetResponse{}
+	result := FaceGetResponse{}
 
-	resp, rawResp, err := s.client.Do(ctx, req)
-	fErr := &FindFaceError{}
-	switch resp.StatusCode {
-	case 200:
-		unErr := json.Unmarshal(rawResp, &result)
-		if unErr != nil {
-			return nil, unErr
-		}
-	case 400:
-		unErr := json.Unmarshal(rawResp, &fErr)
-		if unErr != nil {
-			return nil, unErr
-		}
-	default:
-		err = fmt.Errorf("FindFace returned an unhandled status: %s, body: %s", resp.Status, string(rawResp))
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
 	}
-	response.Response = resp
-	response.Faces = result
-	response.Error = fErr
-	response.RawResponseBody = rawResp
-	return response, err
+
+	return &result, nil
 }

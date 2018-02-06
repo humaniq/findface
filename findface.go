@@ -104,10 +104,42 @@ func (c *Client) NewRequest(method, urlPath string, body interface{}) (*http.Req
 	return req, nil
 }
 
-// Do sends an API request and returns the API response.
+// Do sends an API request and set response into `result`.
 // The provided ctx must be non-nil. If it is canceled or times out,
 // ctx.Err() will be returned.
-func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, []byte, error) {
+func (c *Client) Do(ctx context.Context, req *http.Request, result responser) error {
+	response, body, err := c.makeRequest(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	var findFaceError *FindFaceError
+	switch response.StatusCode {
+	case 200, 201, 204:
+		if len(body) == 0 {
+			break
+		}
+
+		if err := json.Unmarshal(body, result); err != nil {
+			return err
+		}
+	case 400, 500:
+		if err := json.Unmarshal(body, &findFaceError); err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("FindFace returned an unhandled status: %s, body: %s", response.Status, string(body))
+	}
+
+	result.
+		setResponse(response).
+		setRawResponseBody(body).
+		setError(findFaceError)
+
+	return nil
+}
+
+func (c *Client) makeRequest(ctx context.Context, req *http.Request) (*http.Response, []byte, error) {
 	req = req.WithContext(ctx)
 
 	resp, err := c.client.Do(req)
@@ -183,11 +215,6 @@ func cloneRequest(r *http.Request) *http.Request {
 		r2.Header[k] = append([]string(nil), s...)
 	}
 	return r2
-}
-
-type FindFaceResponse struct {
-	RawResponseBody []byte
-	Response        *http.Response
 }
 
 // FindFaceError represents the error response object that is returned when
