@@ -8,14 +8,14 @@ type FaceVerifyOptions struct {
 	// The first image external URL
 	FirstPhoto string `json:"photo1"`
 
-	// Bounding boxes for the faces on the first photo.
-	FirstBoundingBox *BoundingBox `json:"bbox1"`
+	// Array of bounding boxes for the faces on the first photo.
+	FirstBoundingBoxes []*BoundingBox `json:"bbox1,omitempty"`
 
 	// The second image external URL
 	SecondPhoto string `json:"photo2"`
 
-	// Bounding boxes for the faces on the second photo.
-	SecondBoundingBox *BoundingBox `json:"bbox2"`
+	// Array of bounding boxes for the faces on the second photo.
+	SecondBoundingBoxes []*BoundingBox `json:"bbox2,omitempty"`
 
 	// Specifies behavior in case if multiple faces are detected on the photo; one of:
 	// `reject` return an error and a list of faces if more than one face is detected on the provided photo
