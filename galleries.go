@@ -23,9 +23,12 @@ func (s *GalleriesService) List(ctx context.Context) (*GalleriesListResponse, er
 		return nil, err
 	}
 
-	var result *GalleriesListResponse
-	resp, rawResp, err := s.client.Do(ctx, req)
-	result.Response = resp
-	result.RawResponseBody = rawResp
-	return result, err
+	result := GalleriesListResponse{}
+
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

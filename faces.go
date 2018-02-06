@@ -86,9 +86,12 @@ func (s *FacesService) List(ctx context.Context, opt *FaceListOptions) (*FaceLis
 		return nil, err
 	}
 
-	result := &FaceListResult{}
-	resp, rawResp, err := s.client.Do(ctx, req)
-	result.Response = resp
-	result.RawResponseBody = rawResp
-	return result, err
+	result := FaceListResult{}
+
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

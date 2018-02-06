@@ -2,7 +2,6 @@ package findface
 
 import (
 	"context"
-	"encoding/json"
 )
 
 type FaceVerifyOptions struct {
@@ -31,7 +30,6 @@ type FaceVerifyOptions struct {
 
 type FaceVerifyResultResponse struct {
 	FindFaceResponse
-	Error   *FindFaceError
 	Results []*FaceVerifyResult `json:"results"`
 }
 
@@ -54,24 +52,12 @@ func (s *FacesService) Verify(ctx context.Context, opt *FaceVerifyOptions) (*Fac
 		return nil, err
 	}
 
-	var result *FaceVerifyResultResponse
-	var fErr *FindFaceError
-	resp, rawResp, err := s.client.Do(ctx, req)
-	switch resp.StatusCode {
-	case 200:
-		unErr := json.Unmarshal(rawResp, &result)
-		if unErr != nil {
-			return nil, unErr
-		}
-	case 400:
-		unErr := json.Unmarshal(rawResp, &fErr)
-		if unErr != nil {
-			return nil, unErr
-		}
-	default:
+	result := FaceVerifyResultResponse{}
+
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
 	}
-	result.Response = resp
-	result.RawResponseBody = rawResp
-	result.Error = fErr
-	return result, err
+
+	return &result, nil
 }

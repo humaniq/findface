@@ -25,7 +25,6 @@ type FaceUpdateOptions struct {
 
 type FaceUpdateResponse struct {
 	FindFaceResponse
-	Error *FindFaceError
 }
 
 func (s *FacesService) Update(ctx context.Context, opt *FaceUpdateOptions) (*FaceUpdateResponse, error) {
@@ -39,9 +38,12 @@ func (s *FacesService) Update(ctx context.Context, opt *FaceUpdateOptions) (*Fac
 		return nil, err
 	}
 
-	var result = &FaceUpdateResponse{}
-	resp, rawResp, err := s.client.Do(ctx, req)
-	result.Response = resp
-	result.RawResponseBody = rawResp
-	return result, err
+	result := FaceUpdateResponse{}
+
+	err = s.client.Do(ctx, req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
